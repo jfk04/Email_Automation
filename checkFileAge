@@ -1,0 +1,105 @@
+import win32com.client as win32
+import os.path
+import time
+from configparser import ConfigParser
+import tkinter as tk
+
+
+def readIni():
+    config = ConfigParser()
+    config.read('AIDA55config.ini')
+    anzahl_minuten = config["DEFAULT"] ["Anzahl_Minuten"]
+    empfaenger = config["DEFAULT"] ["Mail_Empfaenger"]
+    anzahl_pfade = config["PATHS"] ["anzahl_pfade"]
+    pfad = config["PATHS"] ["pfad"]
+    return anzahl_minuten, empfaenger, anzahl_pfade, pfad
+    
+def mehrerePfade(pfad, anzahlPfade):
+    config = ConfigParser()
+    config.read('AIDA55config.ini')
+    paths = []
+    paths.append(pfad)
+    for zahl in range(2,int(anzahlPfade) + 1):
+        pfad = config["PATHS"] ["pfad" + str(zahl)]
+        paths.append(pfad)
+    return paths
+
+def sendMail(empfaenger):
+    outlook = win32.Dispatch('Outlook.Application')
+
+    mail_item = outlook.CreateItem(0)
+    mail_item.Subject = "Fehler in der 55"
+    mail_item.BodyFormat = 1
+    mail_item.Body = "AIDA 55 hat sich aufgehangen"
+    mail_item.Sender = "Fehler in der 55"
+    mail_item.To = empfaenger
+
+    mail_item.Display()
+    mail_item.save()
+    mail_item.Send()
+
+def checkFileAge(anzahl_minuten, empfaenger, pfad):
+    if os.path.exists(pfad):
+        while(True):
+            currentTime = time.time()
+            fileAge = os.path.getmtime(pfad)
+            if currentTime - fileAge > int(anzahl_minuten) * 60:
+                sendMail(empfaenger)
+                break
+    else:
+        print("Der angegebene Pfad existiert nicht. Bitte überprüfen Sie die 'AIDA55config.ini'")
+
+def checkMoreFileAge(anzahl_minuten, empfaenger, paths):
+    failed = False
+    while not failed:
+        for pfad in paths:
+            if os.path.exists(pfad):
+                currentTime = time.time()
+                fileAge = os.path.getmtime(pfad)
+                if currentTime - fileAge > int(anzahl_minuten) * 60:
+                    sendMail(empfaenger)
+                    failed = True
+                    break
+            else:
+                print(f"Der Pfad {pfad} wurde nicht gefunden")
+                paths.remove(pfad)
+        
+def createIni():
+    config = ConfigParser()
+    print("Anscheinend gibt es noch keine AIDA55config.ini. \nHierdurch wird diese erstellt.")
+    print("Sie können auch nachträgliche Änderungen in der AIDA55config.ini vornehmen.")
+
+    empfaenger = input("An welche Email-Adresse soll eine Mail im Falle eines Abbruchs geschickt werden? ")
+    anzahl_minuten = input("Nach wie vielen Minuten soll eine Mail verschickt werden? ")
+    anzahl_pfade = input("Wie viele Dateien sollen auf Änderungen überprüft werden? ")
+    config["DEFAULT"] = {
+        "anzahl_minuten": anzahl_minuten,
+        "mail_empfaenger": empfaenger
+    }
+    config["PATHS"] = {
+        "anzahl_pfade":anzahl_pfade
+    }
+    if int(anzahl_pfade) > 1:
+        for zahl in range(1,int(anzahl_pfade) + 1):
+            path = input(f"Wie lautet der {zahl}. Pfad? ")
+            if zahl == 1:
+                config.set("PATHS", "pfad", path)
+            else:
+                config.set("PATHS","pfad" + str(zahl),path)
+    else:
+        pfad = input("Wie lautet der Pfad? ")
+        config.set("PATHS", "pfad", pfad)
+    with open("AIDA55config.ini","w") as f:
+        config.write(f)
+
+if __name__ == "__main__":
+    if os.path.exists("AIDA55config.ini"):
+        anzahl_minuten, empfaenger, anzahl_pfade, pfad = readIni()
+    else:
+        createIni()
+        anzahl_minuten, empfaenger, anzahl_pfade, pfad = readIni()
+    if int(anzahl_pfade) > 1:
+        paths = mehrerePfade(pfad, anzahl_pfade)
+        checkMoreFileAge(anzahl_minuten, empfaenger, paths)
+    else:
+        checkFileAge(anzahl_minuten, empfaenger, pfad)
