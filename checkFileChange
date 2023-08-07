@@ -52,7 +52,7 @@ def createIni():
     with open("CheckFile.ini","w") as f:
         config.write(f)
 
-def checkIfFileExist(anzahl_sekunden, empfaenger, pfad):
+def checkForFile(anzahl_sekunden, empfaenger, pfad):
     while(True):
         if os.path.exists(pfad):
             sendMail(empfaenger)
@@ -61,12 +61,12 @@ def checkIfFileExist(anzahl_sekunden, empfaenger, pfad):
             time.sleep(anzahl_sekunden)
 
 
-def AIDA55Dienstueberwachung():
+def checkIfFileExist():
     if os.path.exists("AIDA55config.ini"):
         anzahl_sekunden, empfaenger, pfad = readIni()
     else:
         createIni()
         anzahl_sekunden, empfaenger, pfad = readIni()
-    checkIfFileExist(anzahl_sekunden, empfaenger, pfad)
+    checkForFile(anzahl_sekunden, empfaenger, pfad)
 
-AIDA55Dienstueberwachung()
+checkIfFileExist()
