@@ -35,11 +35,12 @@ def createIni():
 
     empfaenger = input("An welche Email-Adresse soll eine Mail im Falle eines Abbruchs geschickt werden? ")
     while True:
-        anzahl_sekunden = input("Nach wie vielen Sekunden soll die Datei üperprüft werden verschickt werden? ")
-        if anzahl_sekunden.isnumeric:
+        try:
+            anzahl_sekunden = input("Nach wie vielen Sekunden soll die Datei üperprüft werden verschickt werden? ")
+            a = int(anzahl_sekunden)
             break
-        else:
-           print("Bitte geben Sie eine ganze Zahl an") 
+        except:
+            print("Bitte geben Sie eine ganze Zahl an") 
     pfad = input("Wie lautet die Datei, die im Falle eines Abbruchs erstellt werden soll? Bitte geben Sie den vollständigen Pfad zu dieser Datei an: ")
     config["DEFAULT"] = {
         "Anzahl_Sekunden": anzahl_sekunden,
@@ -48,7 +49,6 @@ def createIni():
     config["PATHS"] = {
         "pfad":pfad
     }
-    config.set("PATHS", "pfad", pfad)
     with open("CheckFile.ini","w") as f:
         config.write(f)
 
@@ -58,15 +58,13 @@ def checkForFile(anzahl_sekunden, empfaenger, pfad):
             sendMail(empfaenger)
             break
         else:
-            time.sleep(anzahl_sekunden)
+            time.sleep(int(anzahl_sekunden))
 
 
 def checkIfFileExist():
-    if os.path.exists("AIDA55config.ini"):
+    if os.path.exists("CheckFile.ini"):
         anzahl_sekunden, empfaenger, pfad = readIni()
     else:
         createIni()
         anzahl_sekunden, empfaenger, pfad = readIni()
     checkForFile(anzahl_sekunden, empfaenger, pfad)
-
-checkIfFileExist()
