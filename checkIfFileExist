@@ -7,10 +7,10 @@ def sendMail(empfaenger, fileName = ""):
     outlook = win32.Dispatch('Outlook.Application')
 
     mail_item = outlook.CreateItem(0)
-    mail_item.Subject = "Die Datei wird nicht geupdatet"
+    mail_item.Subject = "Fehler"
     mail_item.BodyFormat = 1
     if fileName == "":
-        mail_item.Body = "Die Datei wird nicht geupdatet"
+        mail_item.Body = "Die Kontrolldatei wurde erstellt"
     else:
         mail_item.Body = f"Die Datei {fileName} ändert sich nicht. Das Programm hat sich vermutlich aufgehangen"
     mail_item.Sender = "Datei wurde erstellt"
@@ -36,7 +36,7 @@ def createIni():
     empfaenger = input("An welche Email-Adresse soll eine Mail im Falle eines Abbruchs geschickt werden? ")
     while True:
         try:
-            anzahl_sekunden = input("Nach wie vielen Sekunden soll die Datei üperprüft werden verschickt werden? ")
+            anzahl_sekunden = input("Nach wie vielen Sekunden soll die Datei üperprüft werden? ")
             a = int(anzahl_sekunden)
             break
         except:
