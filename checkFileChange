@@ -1,0 +1,72 @@
+import win32com.client as win32
+import os.path
+import time
+from configparser import ConfigParser
+
+def sendMail(empfaenger, fileName = ""):
+    outlook = win32.Dispatch('Outlook.Application')
+
+    mail_item = outlook.CreateItem(0)
+    mail_item.Subject = "Die Datei wird nicht geupdatet"
+    mail_item.BodyFormat = 1
+    if fileName == "":
+        mail_item.Body = "Die Datei wird nicht geupdatet"
+    else:
+        mail_item.Body = f"Die Datei {fileName} ändert sich nicht. Das Programm hat sich vermutlich aufgehangen"
+    mail_item.Sender = "Datei wurde erstellt"
+    mail_item.To = empfaenger
+
+    mail_item.Display()
+    mail_item.save()
+    mail_item.Send()
+
+def readIni():
+    config = ConfigParser()
+    config.read('CheckFile.ini')
+    anzahl_sekunden = config["DEFAULT"] ["Anzahl_Sekunden"]
+    empfaenger = config["DEFAULT"] ["Mail_Empfaenger"]
+    pfad = config["PATHS"] ["pfad"]
+    return anzahl_sekunden, empfaenger, pfad
+
+def createIni():
+    config = ConfigParser()
+    print("Anscheinend gibt es noch keine CheckFile.ini. \nHierdurch wird diese erstellt.")
+    print("Sie können auch nachträgliche Änderungen in der CheckFile.ini vornehmen.")
+
+    empfaenger = input("An welche Email-Adresse soll eine Mail im Falle eines Abbruchs geschickt werden? ")
+    while True:
+        anzahl_sekunden = input("Nach wie vielen Sekunden soll die Datei üperprüft werden verschickt werden? ")
+        if anzahl_sekunden.isnumeric:
+            break
+        else:
+           print("Bitte geben Sie eine ganze Zahl an") 
+    pfad = input("Wie lautet die Datei, die im Falle eines Abbruchs erstellt werden soll? Bitte geben Sie den vollständigen Pfad zu dieser Datei an: ")
+    config["DEFAULT"] = {
+        "Anzahl_Sekunden": anzahl_sekunden,
+        "mail_empfaenger": empfaenger
+    }
+    config["PATHS"] = {
+        "pfad":pfad
+    }
+    config.set("PATHS", "pfad", pfad)
+    with open("CheckFile.ini","w") as f:
+        config.write(f)
+
+def checkIfFileExist(anzahl_sekunden, empfaenger, pfad):
+    while(True):
+        if os.path.exists(pfad):
+            sendMail(empfaenger)
+            break
+        else:
+            time.sleep(anzahl_sekunden)
+
+
+def AIDA55Dienstueberwachung():
+    if os.path.exists("AIDA55config.ini"):
+        anzahl_sekunden, empfaenger, pfad = readIni()
+    else:
+        createIni()
+        anzahl_sekunden, empfaenger, pfad = readIni()
+    checkIfFileExist(anzahl_sekunden, empfaenger, pfad)
+
+AIDA55Dienstueberwachung()
