@@ -7,7 +7,7 @@ def sendMail(empfaenger, fileName = ""):
     outlook = win32.Dispatch('Outlook.Application')
 
     mail_item = outlook.CreateItem(0)
-    mail_item.Subject = "Die Datei wird nicht geupdatet"
+    mail_item.Subject = "Fehler"
     mail_item.BodyFormat = 1
     if fileName == "":
         mail_item.Body = "Die Datei wird nicht geupdatet"
