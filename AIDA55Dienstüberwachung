@@ -2,7 +2,6 @@ import win32com.client as win32
 import os.path
 import time
 from configparser import ConfigParser
-import tkinter as tk
 
 
 def readIni():
@@ -24,13 +23,16 @@ def mehrerePfade(pfad, anzahlPfade):
         paths.append(pfad)
     return paths
 
-def sendMail(empfaenger):
+def sendMail(empfaenger, fileName = ""):
     outlook = win32.Dispatch('Outlook.Application')
 
     mail_item = outlook.CreateItem(0)
     mail_item.Subject = "Fehler in der 55"
     mail_item.BodyFormat = 1
-    mail_item.Body = "AIDA 55 hat sich aufgehangen"
+    if fileName == "":
+        mail_item.Body = "AIDA 55 hat sich aufgehangen"
+    else:
+        mail_item.Body = f"Die Datei {fileName} ändert sich nicht. Das Programm hat sich vermutlich aufgehangen"
     mail_item.Sender = "Fehler in der 55"
     mail_item.To = empfaenger
 
@@ -54,12 +56,15 @@ def checkMoreFileAge(anzahl_minuten, empfaenger, paths):
     while not failed:
         for pfad in paths:
             if os.path.exists(pfad):
+                fileName = pfad
                 currentTime = time.time()
                 fileAge = os.path.getmtime(pfad)
                 if currentTime - fileAge > int(anzahl_minuten) * 60:
-                    sendMail(empfaenger)
-                    failed = True
-                    break
+                    sendMail(empfaenger, fileName)
+                    paths.remove(pfad)
+                    if not paths: 
+                        failed = True
+                        break
             else:
                 print(f"Der Pfad {pfad} wurde nicht gefunden")
                 paths.remove(pfad)
@@ -70,7 +75,12 @@ def createIni():
     print("Sie können auch nachträgliche Änderungen in der AIDA55config.ini vornehmen.")
 
     empfaenger = input("An welche Email-Adresse soll eine Mail im Falle eines Abbruchs geschickt werden? ")
-    anzahl_minuten = input("Nach wie vielen Minuten soll eine Mail verschickt werden? ")
+    while True:
+        anzahl_minuten = input("Nach wie vielen Minuten soll eine Mail verschickt werden? ")
+        if float(anzahl_minuten) % 1 == 0:
+            break
+        else:
+           print("Bitte geben Sie eine ganze Zahl an") 
     anzahl_pfade = input("Wie viele Dateien sollen auf Änderungen überprüft werden? ")
     config["DEFAULT"] = {
         "anzahl_minuten": anzahl_minuten,
@@ -92,7 +102,7 @@ def createIni():
     with open("AIDA55config.ini","w") as f:
         config.write(f)
 
-if __name__ == "__main__":
+def AIDA55Dienstueberwachung():
     if os.path.exists("AIDA55config.ini"):
         anzahl_minuten, empfaenger, anzahl_pfade, pfad = readIni()
     else:
@@ -103,3 +113,4 @@ if __name__ == "__main__":
         checkMoreFileAge(anzahl_minuten, empfaenger, paths)
     else:
         checkFileAge(anzahl_minuten, empfaenger, pfad)
+
