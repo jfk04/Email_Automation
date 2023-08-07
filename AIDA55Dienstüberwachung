@@ -76,11 +76,12 @@ def createIni():
 
     empfaenger = input("An welche Email-Adresse soll eine Mail im Falle eines Abbruchs geschickt werden? ")
     while True:
-        anzahl_minuten = input("Nach wie vielen Minuten soll eine Mail verschickt werden? ")
-        if float(anzahl_minuten) % 1 == 0:
+        try:
+            anzahl_minuten = input("Nach wie vielen Minuten soll eine Mail verschickt werden? ")
+            a = int(anzahl_minuten)
             break
-        else:
-           print("Bitte geben Sie eine ganze Zahl an") 
+        except:
+            print("Bitte geben Sie eine ganze Zahl an") 
     anzahl_pfade = input("Wie viele Dateien sollen auf Änderungen überprüft werden? ")
     config["DEFAULT"] = {
         "anzahl_minuten": anzahl_minuten,
@@ -91,7 +92,7 @@ def createIni():
     }
     if int(anzahl_pfade) > 1:
         for zahl in range(1,int(anzahl_pfade) + 1):
-            path = input(f"Wie lautet der {zahl}. Pfad? ")
+            path = input(f"Wie lautet die {zahl}. Datei? Bitte vollständigen Pfad angeben: ")
             if zahl == 1:
                 config.set("PATHS", "pfad", path)
             else:
