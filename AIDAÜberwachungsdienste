@@ -7,7 +7,7 @@ def abfrage():
     while True:
         print("Geben Sie nun die entsprechende Zahl ein: ")
         print("1 : Dateien auf Änderungen überwachen")
-        print("2 : Das letzte Änderungsdatum von Dateien überwchen")
+        print("2 : Das letzte Änderungsdatum von Dateien überwachen")
         print("3 : Überwachen, ob bestimmte Dateien existieren")
         eingabe = input()
         if eingabe in ('1','2','3'):
@@ -22,3 +22,4 @@ if __name__=="__main__":
         AIDA55Dienstüberwachung.AIDA55Dienstueberwachung()
     elif auswahl == 3:
         checkIfFileExist.checkIfFileExist()
+    
