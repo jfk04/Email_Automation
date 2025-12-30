@@ -1,4 +1,4 @@
-import AIDA55Dienstüberwachung
+import ADA55Dienstüberwachung
 import checkFileChange
 import checkIfFileExist
 
@@ -19,7 +19,7 @@ if __name__=="__main__":
     if auswahl == 1:
         checkFileChange.checkFileChange()
     elif auswahl == 2:
-        AIDA55Dienstüberwachung.AIDA55Dienstueberwachung()
+        ADA55Dienstüberwachung.ADA55Dienstueberwachung()
     elif auswahl == 3:
         checkIfFileExist.checkIfFileExist()
     
