@@ -2,7 +2,7 @@ import win32com.client as win32
 import os.path
 import time
 from configparser import ConfigParser
-
+ 
 
 def readIni():
     config = ConfigParser()
