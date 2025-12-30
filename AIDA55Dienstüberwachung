@@ -6,7 +6,7 @@ from configparser import ConfigParser
 
 def readIni():
     config = ConfigParser()
-    config.read('AIDA55config.ini')
+    config.read('ADA55config.ini')
     anzahl_minuten = config["DEFAULT"] ["Anzahl_Minuten"]
     empfaenger = config["DEFAULT"] ["Mail_Empfaenger"]
     anzahl_pfade = config["PATHS"] ["anzahl_pfade"]
@@ -15,7 +15,7 @@ def readIni():
     
 def mehrerePfade(pfad, anzahlPfade):
     config = ConfigParser()
-    config.read('AIDA55config.ini')
+    config.read('ADA55config.ini')
     paths = []
     paths.append(pfad)
     for zahl in range(2,int(anzahlPfade) + 1):
@@ -30,7 +30,7 @@ def sendMail(empfaenger, fileName = ""):
     mail_item.Subject = "Fehler in der 55"
     mail_item.BodyFormat = 1
     if fileName == "":
-        mail_item.Body = "AIDA 55 hat sich aufgehangen"
+        mail_item.Body = "ADA 55 hat sich aufgehangen"
     else:
         mail_item.Body = f"Die Datei {fileName} ändert sich nicht. Das Programm hat sich vermutlich aufgehangen"
     mail_item.Sender = "Fehler in der 55"
@@ -71,8 +71,8 @@ def checkMoreFileAge(anzahl_minuten, empfaenger, paths):
         
 def createIni():
     config = ConfigParser()
-    print("Anscheinend gibt es noch keine AIDA55config.ini. \nHierdurch wird diese erstellt.")
-    print("Sie können auch nachträgliche Änderungen in der AIDA55config.ini vornehmen.")
+    print("Anscheinend gibt es noch keine ADA55config.ini. \nHierdurch wird diese erstellt.")
+    print("Sie können auch nachträgliche Änderungen in der ADA55config.ini vornehmen.")
 
     empfaenger = input("An welche Email-Adresse soll eine Mail im Falle eines Abbruchs geschickt werden? ")
     while True:
@@ -100,11 +100,11 @@ def createIni():
     else:
         pfad = input("Wie lautet der Pfad? ")
         config.set("PATHS", "pfad", pfad)
-    with open("AIDA55config.ini","w") as f:
+    with open("ADA55config.ini","w") as f:
         config.write(f)
 
-def AIDA55Dienstueberwachung():
-    if os.path.exists("AIDA55config.ini"):
+def ADA55Dienstueberwachung():
+    if os.path.exists("ADA55config.ini"):
         anzahl_minuten, empfaenger, anzahl_pfade, pfad = readIni()
     else:
         createIni()
