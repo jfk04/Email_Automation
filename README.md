@@ -12,8 +12,10 @@ A small Python program that I developed for my company. It should monitor the la
 
 ## 🛠 Tech Stack
 
-🐍Python /n
+🐍Python  
+
 Libraries:
+
 - configparser
 - os
 - smtplib
