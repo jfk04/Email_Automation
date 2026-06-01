@@ -12,7 +12,7 @@ A small Python program that I developed for my company. It should monitor the la
 
 ## 🛠 Tech Stack
 
-🐍Python
+🐍Python /n
 Libraries:
 - configparser
 - os
